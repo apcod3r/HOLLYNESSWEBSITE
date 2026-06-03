@@ -9,9 +9,9 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { value: 100, suffix: '%+', label: 'Annual Revenue Growth' },
+  { value: 100, suffix: '%', label: '≈Revenue Growth (YoY)' },
   { value: 5, suffix: '+', label: 'Branch Offices Nationwide' },
-  { value: 6, suffix: '+', label: 'Major Client Partners' },
+  { value: 10, suffix: '+', label: 'Major Clients' },
   { value: 4, suffix: '+', label: 'Years of Excellence' },
 ]
 
@@ -80,7 +80,7 @@ export default function HeroSection() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, rgba(6,18,41,0.72) 0%, rgba(10,31,68,0.58) 50%, rgba(6,18,41,0.65) 100%)',
+            background: 'linear-gradient(135deg, rgba(6,18,41,0.45) 2%, rgba(10,31,68,0.30) 55%, rgba(6,18,41,0.40) 98%)',
           }}
         />
         {/* Subtle gold vignette at bottom */}
@@ -102,7 +102,7 @@ export default function HeroSection() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-[#D4A017]/15 border border-[#D4A017]/30 text-[#D4A017] text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
                 <ShieldCheckIcon className="w-4 h-4" />
-                Licensed Commission Agent · Tanzania
+                Hollyness &amp; Respishers Company Limited
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 font-serif">
@@ -111,12 +111,12 @@ export default function HeroSection() {
                 Partner in Tanzania
               </h1>
 
-              <p className="text-[#C8D5E5] text-lg md:text-xl leading-relaxed mb-4">
+              <p className="text-white/95 text-lg md:text-xl leading-relaxed mb-4 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                 We help individuals, companies, and institutions recover debts, execute court orders, and manage auctions with{' '}
-                <span className="text-white font-medium">professionalism, confidentiality and integrity.</span>
+                <span className="text-[#D4A017] font-semibold">professionalism, confidentiality and integrity.</span>
               </p>
 
-              <p className="text-[#8A9BB0] text-base leading-relaxed mb-8">
+              <p className="text-white/85 text-base leading-relaxed mb-8 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                 Head office in Mbeya with branches in Dar es Salaam, Arusha, Dodoma and Mwanza — delivering nationwide coverage since 2021.
               </p>
 
@@ -143,15 +143,6 @@ export default function HeroSection() {
                 </Link>
               </div>
 
-              {/* Trust signals */}
-              <div className="flex flex-wrap gap-4 text-sm text-[#8A9BB0]">
-                {['Licensed & Regulated', 'Nationwide Coverage', 'Confidential & Secure', 'Results-Driven'].map((t) => (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-[#D4A017] rounded-full" />
-                    {t}
-                  </span>
-                ))}
-              </div>
             </div>
 
             {/* Right — info card */}
@@ -186,17 +177,14 @@ export default function HeroSection() {
 
                   <div className="mt-6 p-4 bg-[#D4A017]/10 rounded-lg border border-[#D4A017]/20 text-center">
                     <p className="text-[#D4A017] text-xs font-semibold uppercase tracking-wider">Revenue Growth</p>
-                    <p className="text-white text-2xl font-bold mt-1">100%+</p>
+                    <p className="text-white text-2xl font-bold mt-1">≈100%</p>
                     <p className="text-[#8A9BB0] text-xs mt-0.5">Year-on-year (2022–2024)</p>
                   </div>
                 </div>
 
-                {/* Floating badges */}
-                <div className="absolute -top-4 -right-4 bg-white text-[#0A1F44] px-4 py-2 rounded-lg shadow-lg text-sm font-bold">
-                  ✓ Fully Licensed
-                </div>
+                {/* Floating badge */}
                 <div className="absolute -bottom-4 -left-4 bg-[#D4A017] text-[#0A1F44] px-4 py-2 rounded-lg shadow-lg text-sm font-bold">
-                  6+ Major Partners
+                  10+ Major Clients
                 </div>
               </div>
             </div>

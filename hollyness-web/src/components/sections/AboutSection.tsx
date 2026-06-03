@@ -121,20 +121,26 @@ export default function AboutSection() {
           <div className="grid lg:grid-cols-2 gap-14 items-center">
             {/* Left */}
             <div className={`transition-all duration-700 ${profile.inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
-              <SectionLabel text="Who We Are" />
+              <SectionLabel text="From the Managing Director" />
               <h2 className="text-4xl md:text-5xl font-bold text-[#0A1F44] leading-tight mb-6">
-                Tanzania's Premier<br />
-                <span className="text-[#D4A017]">Commission Agent</span>
+                Welcome to Hollyness &amp;<br />
+                <span className="text-[#D4A017]">Respishers Company</span>
               </h2>
-              <p className="text-gray-600 text-lg leading-relaxed mb-5">
-                <strong className="text-[#0A1F44]">HOLLYNESS & RESPISHERS COMPANY LIMITED</strong> is a fully licensed commission agent offering debt collection, public auctions, general brokerage, execution of court orders and distress for rent services across Tanzania.
-              </p>
-              <p className="text-gray-600 leading-relaxed mb-5">
-                Since incorporation on 5th February 2021, we have established a strong reputation as a trusted provider of professional, confidential, and affordable services to individuals, corporations and public institutions across Tanzania.
-              </p>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                With our head office in Mbeya and branches in Dar es Salaam, Arusha, Dodoma and Mwanza, we serve clients nationwide with flexibility, integrity and excellence.
-              </p>
+              <div className="space-y-4 text-gray-600 leading-relaxed mb-6">
+                <p>Thank you for visiting our website and taking the time to learn about our company.</p>
+                <p>Since our establishment in 2021, our mission has been simple: to provide professional, ethical and results-driven debt recovery and auctioneering services that help our clients protect their assets, recover outstanding debts and achieve peace of mind.</p>
+                <p>What sets us apart is our commitment to integrity, confidentiality and excellence in every assignment we undertake. We understand that debt recovery requires not only legal and technical expertise but also professionalism, respect and a solutions-oriented approach.</p>
+                <p>From our headquarters in Mbeya and through our presence across Tanzania, our dedicated team works tirelessly to deliver efficient and compliant services to financial institutions, businesses, government entities and individuals.</p>
+                <p>Whether you are seeking debt collection, auctioneering, execution of court orders, distress for rent or brokerage services, we look forward to partnering with you and contributing to your success.</p>
+              </div>
+
+              {/* MD Signature */}
+              <div className="mb-7 pt-4 border-t border-gray-200">
+                <p className="text-[#D4A017] font-bold italic text-xl font-serif mb-0.5">Joachim Kalungwe</p>
+                <p className="text-[#0A1F44] text-sm font-semibold">Managing Director</p>
+                <p className="text-gray-400 text-xs">Hollyness &amp; Respishers Company Limited</p>
+              </div>
+
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/about"
@@ -142,12 +148,17 @@ export default function AboutSection() {
                 >
                   Full Company Profile <ArrowRightIcon className="w-4 h-4" />
                 </Link>
-                <Link
-                  to="/contact"
-                  className="flex items-center gap-2 border-2 border-[#0A1F44] text-[#0A1F44] px-5 py-3 rounded-md font-bold text-sm hover:bg-[#0A1F44] hover:text-white transition-colors"
+                <a
+                  href="#contact"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const el = document.getElementById('contact')
+                    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
+                  }}
+                  className="flex items-center gap-2 border-2 border-[#D4A017] text-[#D4A017] px-5 py-3 rounded-md font-bold text-sm hover:bg-[#D4A017] hover:text-[#0A1F44] transition-colors"
                 >
-                  Contact Us
-                </Link>
+                  Contact Our Recovery Team
+                </a>
               </div>
             </div>
 
@@ -218,7 +229,6 @@ export default function AboutSection() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <SectionLabel text="Our Values" />
-            <h2 className="text-4xl font-bold text-[#0A1F44]">What Drives Us</h2>
             <p className="text-gray-500 mt-3 max-w-xl mx-auto">The principles that guide every engagement, decision and relationship we build with our clients.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">

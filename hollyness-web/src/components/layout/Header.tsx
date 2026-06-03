@@ -113,10 +113,14 @@ export default function Header() {
       {/* ── Top info bar ── */}
       <div className="bg-[#061229] text-[#C8D5E5] text-xs hidden md:block">
         <div className="max-w-7xl mx-auto px-6 py-1.5 flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <span>📍</span>
-            <span>Mbeya HQ · Dar es Salaam · Arusha · Dodoma · Mwanza</span>
-          </span>
+          <div className="flex items-center gap-5">
+            {['Licensed & Regulated', 'Nationwide Coverage', 'Confidential & Secure', 'Results-Driven'].map((t) => (
+              <span key={t} className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-[#D4A017] rounded-full" />
+                {t}
+              </span>
+            ))}
+          </div>
           <div className="flex items-center gap-6">
             <a
               href="tel:+255762058614"
@@ -126,10 +130,10 @@ export default function Header() {
               +255 762 058 614
             </a>
             <a
-              href="mailto:hollyrespishersco.ltd@gmail.com"
+              href="mailto:Office@hollyrespishers.com"
               className="hover:text-[#D4A017] transition-colors"
             >
-              hollyrespishersco.ltd@gmail.com
+              Office@hollyrespishers.com
             </a>
           </div>
         </div>
