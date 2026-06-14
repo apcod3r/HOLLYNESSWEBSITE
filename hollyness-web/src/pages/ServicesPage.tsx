@@ -1,10 +1,19 @@
+import ServicesSection from '../components/sections/ServicesSection'
+
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-[#F4F7FA] flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-[#0A1F44]">Our Services</h1>
-        <p className="text-gray-500 mt-2">Coming soon — under construction</p>
+    <>
+      {/* Page header */}
+      <div className="bg-[#0A1F44] pt-28 pb-0">
+        <div className="max-w-7xl mx-auto px-6 pb-0">
+          <div className="flex items-center gap-2 text-[#8A9BB0] text-sm mb-4">
+            <a href="/" className="hover:text-[#D4A017] transition-colors">Home</a>
+            <span>/</span>
+            <span className="text-[#D4A017]">Our Services</span>
+          </div>
+        </div>
       </div>
-    </div>
+      <ServicesSection />
+    </>
   )
 }

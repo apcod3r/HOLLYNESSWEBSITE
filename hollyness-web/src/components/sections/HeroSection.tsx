@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRightIcon, ShieldCheckIcon, ScaleIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline'
+import { ShieldCheckIcon, ScaleIcon, BuildingLibraryIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
+import { useSettings } from '../../contexts/SettingsContext'
 
 interface StatItem {
   value: number
@@ -10,22 +11,21 @@ interface StatItem {
 
 const stats: StatItem[] = [
   { value: 100, suffix: '%', label: '≈Revenue Growth (YoY)' },
-  { value: 5, suffix: '+', label: 'Branch Offices Nationwide' },
-  { value: 10, suffix: '+', label: 'Major Clients' },
-  { value: 4, suffix: '+', label: 'Years of Excellence' },
+  { value: 5,   suffix: '+', label: 'Branch Offices Nationwide' },
+  { value: 10,  suffix: '+', label: 'Major Clients' },
+  { value: 4,   suffix: '+', label: 'Years of Excellence' },
 ]
 
 const quickServices = [
-  { icon: ScaleIcon, label: 'Debt Collection' },
+  { icon: ScaleIcon,           label: 'Debt Collection' },
   { icon: BuildingLibraryIcon, label: 'Public Auctions' },
-  { icon: ShieldCheckIcon, label: 'Court Order Execution' },
-  { icon: ScaleIcon, label: 'Distress for Rent' },
+  { icon: ShieldCheckIcon,     label: 'Court Order Execution' },
+  { icon: ScaleIcon,           label: 'Distress for Rent' },
   { icon: BuildingLibraryIcon, label: 'General Brokerage' },
 ]
 
 function useCountUp(target: number, duration = 2000, start = false) {
   const [count, setCount] = useState(0)
-
   useEffect(() => {
     if (!start) return
     let startTime: number | null = null
@@ -37,7 +37,6 @@ function useCountUp(target: number, duration = 2000, start = false) {
     }
     requestAnimationFrame(step)
   }, [target, duration, start])
-
   return count
 }
 
@@ -56,6 +55,9 @@ function StatCard({ stat, animate }: { stat: StatItem; animate: boolean }) {
 export default function HeroSection() {
   const [statsVisible, setStatsVisible] = useState(false)
   const statsRef = useRef<HTMLDivElement>(null)
+  const { get } = useSettings()
+
+  const heroBg = get('hero_bg_image') || '/tree.png'
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -68,27 +70,24 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Fullscreen background image */}
+      {/* Dynamic background image */}
       <div className="absolute inset-0">
         <img
-          src="/tree.png"
+          key={heroBg}
+          src={heroBg}
           alt=""
           className="w-full h-full object-cover object-center"
           aria-hidden="true"
         />
-        {/* Semi-transparent overlay — light enough to see the background */}
         <div
           className="absolute inset-0"
           style={{
             background: 'linear-gradient(135deg, rgba(6,18,41,0.45) 2%, rgba(10,31,68,0.30) 55%, rgba(6,18,41,0.40) 98%)',
           }}
         />
-        {/* Subtle gold vignette at bottom */}
         <div
           className="absolute bottom-0 left-0 right-0 h-32"
-          style={{
-            background: 'linear-gradient(to top, rgba(6,18,41,1) 0%, transparent 100%)',
-          }}
+          style={{ background: 'linear-gradient(to top, rgba(6,18,41,1) 0%, transparent 100%)' }}
         />
       </div>
 
@@ -96,10 +95,8 @@ export default function HeroSection() {
       <div className="relative flex-1 flex items-center">
         <div className="max-w-7xl mx-auto px-6 py-20 md:py-28 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-
-            {/* Left — text content */}
+            {/* Left — text */}
             <div>
-              {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-[#D4A017]/15 border border-[#D4A017]/30 text-[#D4A017] text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
                 <ShieldCheckIcon className="w-4 h-4" />
                 Hollyness &amp; Respishers Company Limited
@@ -120,35 +117,11 @@ export default function HeroSection() {
                 Head office in Mbeya with branches in Dar es Salaam, Arusha, Dodoma and Mwanza — delivering nationwide coverage since 2021.
               </p>
 
-              {/* CTA buttons */}
-              <div className="flex flex-wrap gap-4 mb-10">
-                <Link
-                  to="/contact#submit-case"
-                  className="flex items-center gap-2 bg-[#D4A017] text-[#0A1F44] px-6 py-3.5 rounded-md font-bold text-base hover:bg-[#e8b520] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#D4A017]/20"
-                >
-                  Submit a Debt Case
-                  <ArrowRightIcon className="w-4 h-4" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="flex items-center gap-2 border-2 border-[#D4A017] text-[#D4A017] px-6 py-3.5 rounded-md font-bold text-base hover:bg-[#D4A017] hover:text-[#0A1F44] transition-all hover:-translate-y-0.5"
-                >
-                  Request Consultation
-                </Link>
-                <Link
-                  to="/contact"
-                  className="flex items-center gap-2 text-[#C8D5E5] border border-white/20 px-6 py-3.5 rounded-md font-medium text-base hover:text-white hover:border-white/50 transition-all"
-                >
-                  Contact Us
-                </Link>
-              </div>
-
             </div>
 
             {/* Right — info card */}
             <div className="relative hidden lg:flex justify-center">
               <div className="relative w-full max-w-md">
-                {/* Main card */}
                 <div className="bg-[#112a5e] border border-white/10 rounded-2xl p-8 shadow-2xl">
                   <div className="text-center mb-6">
                     <img
@@ -163,10 +136,10 @@ export default function HeroSection() {
                   <div className="space-y-3 text-sm">
                     {[
                       { label: 'Incorporated', value: '5th February 2021' },
-                      { label: 'Reg. Number', value: '150355419' },
+                      { label: 'Reg. Number',  value: '150355419' },
                       { label: 'Auctioneer License', value: '#000003633' },
-                      { label: 'TIN', value: '150-355-419' },
-                      { label: 'Coverage', value: '5 Cities Nationwide' },
+                      { label: 'TIN',          value: '150-355-419' },
+                      { label: 'Coverage',     value: '5 Cities Nationwide' },
                     ].map((row) => (
                       <div key={row.label} className="flex justify-between items-center py-2 border-b border-white/10">
                         <span className="text-[#8A9BB0]">{row.label}</span>
@@ -182,7 +155,6 @@ export default function HeroSection() {
                   </div>
                 </div>
 
-                {/* Floating badge */}
                 <div className="absolute -bottom-4 -left-4 bg-[#D4A017] text-[#0A1F44] px-4 py-2 rounded-lg shadow-lg text-sm font-bold">
                   10+ Major Clients
                 </div>

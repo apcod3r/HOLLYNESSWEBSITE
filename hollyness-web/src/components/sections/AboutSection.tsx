@@ -11,33 +11,37 @@ import {
   CheckCircleIcon,
   BuildingOffice2Icon,
 } from '@heroicons/react/24/outline'
+import { apiGet } from '../../lib/api'
+
+interface ApiTeamMember {
+  id: number
+  name: string
+  role: string
+  department: string
+  bio: string
+  education: string
+  joined_year: number
+  photo_url: string | null
+  sort_order: number
+  is_active: boolean
+}
+
+interface ApiPartner {
+  id: number
+  name: string
+  logo_url: string | null
+  description: string | null
+  website_url: string | null
+  sort_order: number
+  is_active: boolean
+}
 
 const coreValues = [
-  {
-    icon: ShieldCheckIcon,
-    title: 'Integrity',
-    description: 'Acting with honesty and fairness in all engagements.',
-  },
-  {
-    icon: EyeIcon,
-    title: 'Confidentiality',
-    description: 'Protecting client information and interests at all times.',
-  },
-  {
-    icon: StarIcon,
-    title: 'Professionalism',
-    description: 'Delivering services with expertise and diligence.',
-  },
-  {
-    icon: CurrencyDollarIcon,
-    title: 'Affordability',
-    description: 'Ensuring services are cost-effective for all clients.',
-  },
-  {
-    icon: LightBulbIcon,
-    title: 'Innovation',
-    description: 'Continuously seeking better solutions to client needs.',
-  },
+  { icon: ShieldCheckIcon, title: 'Integrity',       description: 'Acting with honesty and fairness in all engagements.' },
+  { icon: EyeIcon,         title: 'Confidentiality', description: 'Protecting client information and interests at all times.' },
+  { icon: StarIcon,        title: 'Professionalism', description: 'Delivering services with expertise and diligence.' },
+  { icon: CurrencyDollarIcon, title: 'Affordability', description: 'Ensuring services are cost-effective for all clients.' },
+  { icon: LightBulbIcon,  title: 'Innovation',       description: 'Continuously seeking better solutions to client needs.' },
 ]
 
 const whyChooseUs = [
@@ -51,35 +55,9 @@ const whyChooseUs = [
   'Compliant with all AML and anti-bribery regulations',
 ]
 
-const team = [
-  {
-    name: 'Joachim Gabriel Kalungwe',
-    role: 'Chief Executive Officer',
-    qualification: 'BA Political Science & Public Administration',
-    since: '2021',
-    bio: 'Over 10 years of progressive experience in debt recovery, management and company leadership. Skilled in administration, client relations, and operational oversight.',
-  },
-  {
-    name: 'Getruda Audphas Myula',
-    role: 'Managing Director',
-    qualification: 'BA Public Administration',
-    since: '2021',
-    bio: 'Skilled administrator ensuring governance and accountability across all company operations.',
-  },
-  {
-    name: 'Godfrey Paul Chunda',
-    role: 'Recovery Manager',
-    qualification: 'Diploma in Shipping & Port Management',
-    since: '2021',
-    bio: 'Leads recovery operations with a focus on professionalism and integrity in all client engagements.',
-  },
-  {
-    name: 'Jerry January',
-    role: 'Legal Advisor',
-    qualification: 'Master of Laws (LL.M)',
-    since: '2021',
-    bio: 'Provides legal advisory, contract management, corporate governance and compliance solutions.',
-  },
+const FALLBACK_CLIENTS = [
+  'Platinum Credit Ltd', 'Victoria Finance PLC', 'FINCA Microfinance Bank',
+  'NMB Bank Plc', 'BRAC Tanzania', 'NOE Microfinance Bank',
 ]
 
 function useInView(threshold = 0.15) {
@@ -107,10 +85,17 @@ function SectionLabel({ text }: { text: string }) {
 }
 
 export default function AboutSection() {
-  const profile = useInView()
-  const values = useInView()
-  const whyUs = useInView()
+  const [team, setTeam]       = useState<ApiTeamMember[]>([])
+  const [partners, setPartners] = useState<ApiPartner[]>([])
+  const profile     = useInView()
+  const values      = useInView()
+  const whyUs       = useInView()
   const teamSection = useInView()
+
+  useEffect(() => {
+    apiGet<ApiTeamMember[]>('/team').then(setTeam).catch(() => {})
+    apiGet<ApiPartner[]>('/partners').then(setPartners).catch(() => {})
+  }, [])
 
   return (
     <section id="about" className="bg-white">
@@ -134,7 +119,6 @@ export default function AboutSection() {
                 <p>Whether you are seeking debt collection, auctioneering, execution of court orders, distress for rent or brokerage services, we look forward to partnering with you and contributing to your success.</p>
               </div>
 
-              {/* MD Signature */}
               <div className="mb-7 pt-4 border-t border-gray-200">
                 <p className="text-[#D4A017] font-bold italic text-xl font-serif mb-0.5">Joachim Kalungwe</p>
                 <p className="text-[#0A1F44] text-sm font-semibold">Managing Director</p>
@@ -142,12 +126,6 @@ export default function AboutSection() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/about"
-                  className="flex items-center gap-2 bg-[#0A1F44] text-white px-5 py-3 rounded-md font-bold text-sm hover:bg-[#112a5e] transition-colors"
-                >
-                  Full Company Profile <ArrowRightIcon className="w-4 h-4" />
-                </Link>
                 <a
                   href="#contact"
                   onClick={(e) => {
@@ -162,13 +140,13 @@ export default function AboutSection() {
               </div>
             </div>
 
-            {/* Right — quick facts grid */}
+            {/* Right — quick facts + partners/clients */}
             <div className={`transition-all duration-700 delay-200 ${profile.inView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: BuildingOffice2Icon, label: 'Founded', value: '2021' },
-                  { icon: BuildingOffice2Icon, label: 'Reg. Number', value: '150355419' },
-                  { icon: BuildingOffice2Icon, label: 'Branches', value: '5 Cities' },
+                  { icon: BuildingOffice2Icon, label: 'Founded',           value: '2021' },
+                  { icon: BuildingOffice2Icon, label: 'Reg. Number',       value: '150355419' },
+                  { icon: BuildingOffice2Icon, label: 'Branches',          value: '5 Cities' },
                   { icon: BuildingOffice2Icon, label: 'Auctioneer License', value: '#000003633' },
                 ].map((fact) => (
                   <div key={fact.label} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
@@ -181,17 +159,32 @@ export default function AboutSection() {
                 ))}
               </div>
 
-              {/* Clients strip */}
+              {/* Dynamic partners / fallback clients */}
               <div className="mt-4 bg-[#0A1F44] rounded-xl p-5">
                 <p className="text-[#D4A017] text-xs font-bold uppercase tracking-wider mb-3">Trusted By</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Platinum Credit Ltd', 'Victoria Finance PLC', 'FINCA Microfinance Bank', 'NMB Bank Plc', 'BRAC Tanzania', 'NOE Microfinance Bank'].map((c) => (
-                    <div key={c} className="text-[#C8D5E5] text-xs py-1.5 px-2 bg-white/5 rounded flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#D4A017] rounded-full flex-shrink-0" />
-                      {c}
-                    </div>
-                  ))}
-                </div>
+                {partners.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    {partners.map((p) => (
+                      <div key={p.id} className="flex items-center gap-2 bg-white/5 rounded-lg p-2">
+                        {p.logo_url ? (
+                          <img src={p.logo_url} alt={p.name} className="h-7 w-auto object-contain flex-shrink-0 max-w-[52px]" />
+                        ) : (
+                          <span className="w-2 h-2 bg-[#D4A017] rounded-full flex-shrink-0" />
+                        )}
+                        <span className="text-[#C8D5E5] text-xs truncate">{p.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {FALLBACK_CLIENTS.map((c) => (
+                      <div key={c} className="text-[#C8D5E5] text-xs py-1.5 px-2 bg-white/5 rounded flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-[#D4A017] rounded-full flex-shrink-0" />
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -273,16 +266,15 @@ export default function AboutSection() {
               </ul>
             </div>
 
-            {/* Financial performance */}
             <div className={`transition-all duration-700 delay-200 ${whyUs.inView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
               <div className="bg-[#0A1F44] rounded-2xl p-8 text-white">
                 <h3 className="text-xl font-bold mb-2 font-serif">Financial Performance</h3>
                 <p className="text-[#8A9BB0] text-sm mb-6">Annual revenue growth — demonstrating sound management and stakeholder confidence.</p>
                 <div className="space-y-4">
                   {[
-                    { year: '2022', revenue: 'TZS 61,883,247', growth: 'Base year', pct: 20 },
-                    { year: '2023', revenue: 'TZS 138,818,086', growth: '+124.32%', pct: 55 },
-                    { year: '2024', revenue: 'TZS 313,683,162', growth: '+125.97%', pct: 100 },
+                    { year: '2022', revenue: 'TZS 61,883,247',   growth: 'Base year', pct: 20 },
+                    { year: '2023', revenue: 'TZS 138,818,086',  growth: '+124.32%',  pct: 55 },
+                    { year: '2024', revenue: 'TZS 313,683,162',  growth: '+125.97%',  pct: 100 },
                   ].map((row) => (
                     <div key={row.year}>
                       <div className="flex justify-between items-center mb-1.5">
@@ -310,7 +302,7 @@ export default function AboutSection() {
         </div>
       </div>
 
-      {/* ── Leadership Team ── */}
+      {/* ── Leadership Team (preview — first 4) ── */}
       <div ref={teamSection.ref} className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
@@ -319,34 +311,46 @@ export default function AboutSection() {
             <p className="text-gray-500 mt-3 max-w-xl mx-auto">Experienced professionals committed to delivering results with integrity and accountability.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((member, i) => (
+            {team.slice(0, 4).map((member, i) => (
               <div
-                key={member.name}
-                className={`group bg-[#F4F7FA] rounded-2xl p-6 border border-transparent hover:border-[#D4A017]/30 hover:shadow-lg transition-all duration-500 ${
+                key={member.id}
+                className={`group bg-[#F4F7FA] rounded-2xl overflow-hidden border border-transparent hover:border-[#D4A017]/30 hover:shadow-lg transition-all duration-500 ${
                   teamSection.inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${i * 120}ms` }}
               >
-                {/* Avatar placeholder */}
-                <div className="w-16 h-16 bg-[#0A1F44] rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#D4A017] transition-colors">
-                  <UserGroupIcon className="w-8 h-8 text-[#D4A017] group-hover:text-[#0A1F44] transition-colors" />
-                </div>
-                <h4 className="font-bold text-[#0A1F44] text-base leading-tight">{member.name}</h4>
-                <p className="text-[#D4A017] text-sm font-semibold mt-0.5 mb-1">{member.role}</p>
-                <p className="text-gray-400 text-xs mb-3">{member.qualification}</p>
-                <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
-                <div className="mt-4 pt-3 border-t border-gray-200 text-xs text-gray-400">
-                  With company since <span className="text-[#0A1F44] font-semibold">{member.since}</span>
+                {/* Photo or placeholder */}
+                {member.photo_url ? (
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={member.photo_url}
+                      alt={member.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-48 bg-[#0A1F44] flex items-center justify-center group-hover:bg-[#D4A017] transition-colors duration-500">
+                    <UserGroupIcon className="w-16 h-16 text-[#D4A017] group-hover:text-[#0A1F44] transition-colors duration-500" />
+                  </div>
+                )}
+                <div className="p-5">
+                  <h4 className="font-bold text-[#0A1F44] text-base leading-tight">{member.name}</h4>
+                  <p className="text-[#D4A017] text-sm font-semibold mt-0.5 mb-1">{member.role}</p>
+                  <p className="text-gray-400 text-xs mb-3">{member.education}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{member.bio}</p>
+                  <div className="mt-4 pt-3 border-t border-gray-200 text-xs text-gray-400">
+                    With company since <span className="text-[#0A1F44] font-semibold">{member.joined_year}</span>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           <div className="text-center mt-10">
             <Link
-              to="/about"
+              to="/team"
               className="inline-flex items-center gap-2 border-2 border-[#0A1F44] text-[#0A1F44] px-6 py-3 rounded-md font-bold text-sm hover:bg-[#0A1F44] hover:text-white transition-colors"
             >
-              View Full Team <ArrowRightIcon className="w-4 h-4" />
+              View Full Team &amp; Organisation <ArrowRightIcon className="w-4 h-4" />
             </Link>
           </div>
         </div>

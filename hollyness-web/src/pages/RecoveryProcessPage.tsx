@@ -1,113 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  DocumentTextIcon,
-  MagnifyingGlassIcon,
-  ChatBubbleLeftRightIcon,
-  ScaleIcon,
-  BuildingLibraryIcon,
-  BanknotesIcon,
-  ChartBarIcon,
   ArrowRightIcon,
   CheckCircleIcon,
   ShieldCheckIcon,
   ClockIcon,
+  ScaleIcon,
 } from '@heroicons/react/24/outline'
+import { apiGet } from '../lib/api'
+import { getIcon } from '../lib/iconMap'
 
-const steps = [
-  {
-    number: '01',
-    icon: DocumentTextIcon,
-    title: 'Case Submission',
-    subtitle: 'You submit your case',
-    description:
-      'The process begins when you submit a debt recovery case to us. You provide all relevant documentation — loan agreements, invoices, contracts, correspondence and any prior communication with the debtor. Our team reviews the file to confirm it is actionable.',
-    whatYouProvide: [
-      'Signed loan agreement or invoice',
-      'Proof of outstanding balance',
-      'Debtor contact details and last known address',
-      'Any prior communication or payment history',
-    ],
-    outcome: 'Case accepted and assigned to a dedicated recovery officer within 24 hours.',
-    duration: '1–2 business days',
-  },
-  {
-    number: '02',
-    icon: MagnifyingGlassIcon,
-    title: 'Assessment & Strategy',
-    subtitle: 'We analyse and plan',
-    description:
-      'Our team conducts a thorough assessment of the debtor\'s financial position, asset base and contact details. We use skip-tracing and credit investigation tools where needed to locate debtors who have relocated or are unresponsive. A tailored recovery strategy is then prepared.',
-    whatYouProvide: [
-      'Additional debtor background if available',
-      'Preferred communication approach',
-      'Any known debtor employment or business details',
-    ],
-    outcome: 'Written recovery strategy delivered to client with estimated timeline and fees.',
-    duration: '2–5 business days',
-  },
-  {
-    number: '03',
-    icon: ChatBubbleLeftRightIcon,
-    title: 'Debtor Engagement',
-    subtitle: 'Professional first contact',
-    description:
-      'We initiate formal contact with the debtor via written demand notice, phone call and — where necessary — a personal visit. All communication is professional, firm and legally compliant. Our goal is to secure voluntary payment at this stage without escalating to legal action.',
-    whatYouProvide: [],
-    outcome: 'Debtor acknowledges the debt and agrees to a repayment plan, or declines — triggering the next stage.',
-    duration: '5–14 business days',
-  },
-  {
-    number: '04',
-    icon: ScaleIcon,
-    title: 'Negotiation & Settlement',
-    subtitle: 'Structured resolution',
-    description:
-      'Where the debtor engages, we facilitate structured negotiation to reach a fair settlement — whether a lump-sum payment, instalment arrangement or partial write-down. All agreed terms are formalised in writing. Our objective is maximum recovery with minimal cost to you.',
-    whatYouProvide: [
-      'Your minimum acceptable settlement position',
-      'Approval of proposed repayment terms',
-    ],
-    outcome: 'Written settlement agreement signed by both parties. Recovery begins immediately.',
-    duration: '7–21 business days',
-  },
-  {
-    number: '05',
-    icon: BuildingLibraryIcon,
-    title: 'Legal Action',
-    subtitle: 'Court-backed enforcement',
-    description:
-      'If negotiation is unsuccessful or the debtor is uncooperative, we proceed to formal legal action. Our certified court brokers and legal advisors file suit, obtain judgment and serve court process documents. We handle all court filings and hearing attendance on your behalf.',
-    whatYouProvide: [
-      'Original signed documentation for court filing',
-      'Authorisation letter for legal representation',
-    ],
-    outcome: 'Court judgment obtained and decree issued in your favour.',
-    duration: '30–90 business days (court-dependent)',
-  },
-  {
-    number: '06',
-    icon: BanknotesIcon,
-    title: 'Recovery & Auction',
-    subtitle: 'Assets seized and sold',
-    description:
-      'With a court decree in hand, we execute the judgment — levying distress, attaching debtor assets and conducting public auctions where required. As a licensed auctioneer under Tanzanian law, we manage the entire auction process: valuation, marketing, sale and settlement.',
-    whatYouProvide: [],
-    outcome: 'Assets sold, proceeds applied to the debt, and balance remitted to you within agreed timelines.',
-    duration: '14–30 business days post-judgment',
-  },
-  {
-    number: '07',
-    icon: ChartBarIcon,
-    title: 'Reporting & Closure',
-    subtitle: 'Full transparency',
-    description:
-      'At every stage of the process, you receive written updates. Upon closure, we provide a full recovery report: amounts collected, costs incurred, actions taken and any remaining balance. We maintain confidential records for your file and advise on any residual enforcement options.',
-    whatYouProvide: [],
-    outcome: 'Comprehensive closure report delivered. Case file archived securely.',
-    duration: 'Ongoing throughout the case',
-  },
-]
+interface ApiStep {
+  id: number
+  step_number: number
+  title: string
+  subtitle: string
+  description: string
+  what_you_provide: string[]
+  outcome: string
+  duration: string
+  icon_name: string
+  is_active: boolean
+}
 
 const guarantees = [
   { icon: ShieldCheckIcon, title: 'Fully Licensed', text: 'Certified commission agent and auctioneer under Tanzanian law.' },
@@ -128,9 +42,14 @@ function useInView(threshold = 0.1) {
 }
 
 export default function RecoveryProcessPage() {
+  const [steps, setSteps] = useState<ApiStep[]>([])
   const [activeStep, setActiveStep] = useState(0)
   const guaranteesRef = useInView(0.1)
   const ctaRef        = useInView(0.1)
+
+  useEffect(() => {
+    apiGet<ApiStep[]>('/process').then(setSteps).catch(() => {})
+  }, [])
 
   return (
     <>
@@ -203,7 +122,7 @@ export default function RecoveryProcessPage() {
             <div className="space-y-2">
               {steps.map((step, i) => (
                 <button
-                  key={step.number}
+                  key={step.step_number}
                   onClick={() => setActiveStep(i)}
                   className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border text-left transition-all duration-200 ${
                     activeStep === i
@@ -216,7 +135,7 @@ export default function RecoveryProcessPage() {
                       activeStep === i ? 'bg-[#D4A017] text-[#0A1F44]' : 'bg-[#F4F7FA] text-[#8A9BB0]'
                     }`}
                   >
-                    {step.number}
+                    {String(step.step_number).padStart(2, '0')}
                   </div>
                   <div className="min-w-0">
                     <p className={`font-bold text-sm truncate transition-colors ${activeStep === i ? 'text-white' : 'text-[#0A1F44]'}`}>
@@ -232,9 +151,11 @@ export default function RecoveryProcessPage() {
 
             {/* Step detail (right, spans 2 cols) */}
             <div className="lg:col-span-2">
-              {steps.map((step, i) => (
+              {steps.map((step, i) => {
+                const StepIcon = getIcon(step.icon_name)
+                return (
                 <div
-                  key={step.number}
+                  key={step.step_number}
                   className={`transition-all duration-300 ${
                     activeStep === i ? 'block' : 'hidden'
                   }`}
@@ -244,11 +165,11 @@ export default function RecoveryProcessPage() {
                     {/* Header */}
                     <div className="flex items-start gap-5 mb-6 pb-6 border-b border-gray-100">
                       <div className="w-16 h-16 bg-[#0A1F44] rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <step.icon className="w-8 h-8 text-[#D4A017]" />
+                        <StepIcon className="w-8 h-8 text-[#D4A017]" />
                       </div>
                       <div>
                         <div className="text-[#D4A017] text-xs font-bold uppercase tracking-wider mb-1">
-                          Step {step.number}
+                          Step {String(step.step_number).padStart(2, '0')}
                         </div>
                         <h3 className="text-2xl font-bold text-[#0A1F44] font-serif">{step.title}</h3>
                         <p className="text-gray-400 text-sm mt-0.5">{step.subtitle}</p>
@@ -259,11 +180,11 @@ export default function RecoveryProcessPage() {
                     <p className="text-gray-600 leading-relaxed mb-6">{step.description}</p>
 
                     {/* What you provide */}
-                    {step.whatYouProvide.length > 0 && (
+                    {step.what_you_provide.length > 0 && (
                       <div className="mb-6">
                         <p className="text-[#0A1F44] font-bold text-sm mb-3">What You Provide:</p>
                         <ul className="space-y-2">
-                          {step.whatYouProvide.map((item) => (
+                          {step.what_you_provide.map((item) => (
                             <li key={item} className="flex items-start gap-2.5 text-sm text-gray-600">
                               <CheckCircleIcon className="w-4 h-4 text-[#D4A017] flex-shrink-0 mt-0.5" />
                               {item}
@@ -302,25 +223,18 @@ export default function RecoveryProcessPage() {
                           Next Step <ArrowRightIcon className="w-3.5 h-3.5" />
                         </button>
                       ) : (
-                        <a
-                          href="/#contact"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            window.location.href = '/'
-                            setTimeout(() => {
-                              const el = document.getElementById('contact')
-                              if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
-                            }, 400)
-                          }}
+                        <Link
+                          to="/contact"
                           className="flex items-center gap-1.5 text-sm font-bold text-[#D4A017] hover:text-[#0A1F44] transition-colors"
                         >
                           Submit Your Case <ArrowRightIcon className="w-3.5 h-3.5" />
-                        </a>
+                        </Link>
                       )}
                     </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
@@ -334,7 +248,7 @@ export default function RecoveryProcessPage() {
           </h3>
           <div className="flex items-start gap-0 min-w-[700px]">
             {steps.map((step, i) => (
-              <div key={step.number} className="flex-1 relative">
+              <div key={step.step_number} className="flex-1 relative">
                 {/* Connector line */}
                 {i < steps.length - 1 && (
                   <div className="absolute top-5 left-1/2 w-full h-0.5 bg-gradient-to-r from-[#D4A017] to-[#D4A017]/30 z-0" />
@@ -348,7 +262,7 @@ export default function RecoveryProcessPage() {
                       ? 'bg-[#D4A017] border-[#D4A017] text-[#0A1F44] scale-110'
                       : 'bg-white border-[#D4A017]/40 text-[#8A9BB0] group-hover:border-[#D4A017] group-hover:text-[#D4A017]'
                   }`}>
-                    {step.number}
+                    {String(step.step_number).padStart(2, '0')}
                   </div>
                   <span className="text-xs text-center text-gray-500 group-hover:text-[#0A1F44] transition-colors leading-tight px-1">
                     {step.title}
@@ -379,20 +293,12 @@ export default function RecoveryProcessPage() {
             Submit your case today and a dedicated recovery officer will contact you within 24 hours to begin the assessment process.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a
-              href="/#contact"
-              onClick={(e) => {
-                e.preventDefault()
-                window.location.href = '/'
-                setTimeout(() => {
-                  const el = document.getElementById('contact')
-                  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
-                }, 400)
-              }}
+            <Link
+              to="/contact"
               className="flex items-center gap-2 bg-[#D4A017] text-[#0A1F44] px-7 py-3.5 rounded-md font-bold hover:bg-[#e8b520] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#D4A017]/20"
             >
               Submit a Debt Case <ArrowRightIcon className="w-4 h-4" />
-            </a>
+            </Link>
             <Link
               to="/industries"
               className="flex items-center gap-2 border-2 border-[#D4A017] text-[#D4A017] px-7 py-3.5 rounded-md font-bold hover:bg-[#D4A017] hover:text-[#0A1F44] transition-all hover:-translate-y-0.5"

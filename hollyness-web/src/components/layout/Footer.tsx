@@ -1,13 +1,15 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { FaFacebook, FaInstagram, FaXTwitter, FaWhatsapp } from 'react-icons/fa6'
 
 const services = [
-  { label: 'Debt Collection', href: '/services#debt-collection' },
-  { label: 'Public Auctions', href: '/services#auctions' },
-  { label: 'Court Order Execution', href: '/services#court-orders' },
-  { label: 'Distress for Rent', href: '/services#distress-rent' },
-  { label: 'General Brokerage', href: '/services#brokerage' },
-  { label: 'Skip Tracing', href: '/services#skip-tracing' },
+  { label: 'Debt Collection',      href: '/services' },
+  { label: 'Public Auctions',      href: '/services' },
+  { label: 'Court Order Execution', href: '/services' },
+  { label: 'Distress for Rent',    href: '/services' },
+  { label: 'General Brokerage',    href: '/services' },
+  { label: 'Skip Tracing',         href: '/services' },
 ]
 
 const quickLinks = [
@@ -28,6 +30,26 @@ const legalLinks = [
 ]
 
 export default function Footer() {
+  const [email, setEmail]   = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email.trim()) return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+      if (res.ok) { setStatus('ok'); setEmail('') }
+      else setStatus('error')
+    } catch {
+      setStatus('error')
+    }
+  }
+
   return (
     <footer className="bg-[#061229] text-[#C8D5E5]">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -47,13 +69,21 @@ export default function Footer() {
               Tanzania's trusted licensed commission agent for debt collection, public auctions, court order execution and general brokerage services.
             </p>
             <div className="flex gap-3">
-              {['f', 'in', 'tw', 'wa'].map((s) => (
+              {[
+                { icon: FaFacebook,  href: '#', label: 'Facebook' },
+                { icon: FaInstagram, href: '#', label: 'Instagram' },
+                { icon: FaXTwitter,  href: '#', label: 'X (Twitter)' },
+                { icon: FaWhatsapp,  href: 'https://wa.me/255762058614', label: 'WhatsApp' },
+              ].map(({ icon: Icon, href, label }) => (
                 <a
-                  key={s}
-                  href="#"
-                  className="w-9 h-9 bg-white/10 hover:bg-[#D4A017] hover:text-[#0A1F44] rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="w-9 h-9 bg-white/10 hover:bg-[#D4A017] hover:text-[#0A1F44] rounded-full flex items-center justify-center text-base transition-colors"
                 >
-                  {s.toUpperCase()}
+                  <Icon />
                 </a>
               ))}
             </div>
@@ -111,19 +141,30 @@ export default function Footer() {
 
             <div className="mt-5">
               <p className="text-xs text-[#8A9BB0] mb-2 font-medium">NEWSLETTER</p>
-              <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="flex-1 bg-white/10 text-white placeholder-[#8A9BB0] text-sm px-3 py-2 rounded-md border border-white/20 focus:outline-none focus:border-[#D4A017]"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#D4A017] text-[#0A1F44] px-3 py-2 rounded-md text-sm font-bold hover:bg-[#e8b520] transition-colors"
-                >
-                  →
-                </button>
-              </form>
+              {status === 'ok' ? (
+                <p className="text-[#D4A017] text-sm font-semibold">You're subscribed!</p>
+              ) : (
+                <form className="flex gap-2" onSubmit={handleSubscribe}>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setStatus('idle') }}
+                    placeholder="Your email"
+                    required
+                    className="flex-1 bg-white/10 text-white placeholder-[#8A9BB0] text-sm px-3 py-2 rounded-md border border-white/20 focus:outline-none focus:border-[#D4A017]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="bg-[#D4A017] text-[#0A1F44] px-3 py-2 rounded-md text-sm font-bold hover:bg-[#e8b520] disabled:opacity-60 transition-colors"
+                  >
+                    {status === 'loading' ? '…' : '→'}
+                  </button>
+                </form>
+              )}
+              {status === 'error' && (
+                <p className="text-red-400 text-xs mt-1">Something went wrong. Try again.</p>
+              )}
             </div>
           </div>
         </div>
@@ -139,6 +180,9 @@ export default function Footer() {
                 {l.label}
               </Link>
             ))}
+            <Link to="/admin/login" className="hover:text-[#D4A017] transition-colors">
+              CMS
+            </Link>
           </div>
         </div>
       </div>

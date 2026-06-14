@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// About Us is a homepage scroll section — redirect and scroll to it.
 export default function AboutPage() {
   const navigate = useNavigate()
   useEffect(() => {

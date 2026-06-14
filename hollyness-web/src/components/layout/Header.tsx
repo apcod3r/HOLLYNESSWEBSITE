@@ -189,13 +189,12 @@ export default function Header() {
             >
               Client Portal
             </Link>
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, 'contact', null)}
+            <Link
+              to="/contact"
               className="bg-[#D4A017] text-[#0A1F44] px-4 py-2.5 rounded-md text-sm font-bold hover:bg-[#e8b520] transition-all hover:-translate-y-0.5"
             >
               Submit a Case
-            </a>
+            </Link>
           </div>
 
           {/* Hamburger for mobile */}
@@ -242,13 +241,13 @@ export default function Header() {
             >
               Client Portal Login
             </Link>
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, 'contact', null)}
+            <Link
+              to="/contact"
+              onClick={() => setMobileOpen(false)}
               className="block text-center py-3 px-4 rounded-md bg-[#D4A017] text-[#0A1F44] text-sm font-bold"
             >
               Submit a Debt Case
-            </a>
+            </Link>
           </div>
         </div>
       )}

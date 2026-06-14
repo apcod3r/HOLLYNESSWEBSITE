@@ -1,0 +1,25 @@
+# Python
+hollyness-api/venv/
+hollyness-api/__pycache__/
+hollyness-api/app/__pycache__/
+hollyness-api/app/**/__pycache__/
+hollyness-api/*.pyc
+hollyness-api/.env
+
+# Node / Frontend
+hollyness-web/node_modules/
+hollyness-web/dist/
+
+# Uploads (binary files — kept on server, not in git)
+uploads/
+
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docs from client (not source code)
+*.docx
+PICTURE/

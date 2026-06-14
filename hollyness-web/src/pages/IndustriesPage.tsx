@@ -1,100 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  BuildingLibraryIcon,
-  CurrencyDollarIcon,
-  WrenchScrewdriverIcon,
   ShieldCheckIcon,
-  DevicePhoneMobileIcon,
-  HeartIcon,
-  AcademicCapIcon,
-  TruckIcon,
-  HomeModernIcon,
-  BuildingOffice2Icon,
-  ScaleIcon,
   ArrowRightIcon,
   CheckCircleIcon,
+  ScaleIcon,
 } from '@heroicons/react/24/outline'
+import { apiGet } from '../lib/api'
+import { getIcon } from '../lib/iconMap'
 
-const industries = [
-  {
-    icon: BuildingLibraryIcon,
-    title: 'Banks & Financial Institutions',
-    description:
-      'We partner with commercial banks and financial institutions to recover non-performing loans, enforce loan agreements and manage distressed portfolios across all branches in Tanzania.',
-    cases: ['Non-performing loans', 'Overdraft recovery', 'Personal & business loan defaults', 'Mortgage arrears'],
-  },
-  {
-    icon: CurrencyDollarIcon,
-    title: 'SACCOs & Microfinance (MFIs)',
-    description:
-      'Our team understands the unique challenges facing cooperative societies and microfinance lenders — including member defaults and tracing borrowers who have relocated.',
-    cases: ['Member loan defaults', 'Group lending recovery', 'Skip tracing for relocated debtors', 'Asset tracing'],
-  },
-  {
-    icon: WrenchScrewdriverIcon,
-    title: 'Construction Companies',
-    description:
-      'We assist contractors and subcontractors in recovering unpaid invoices, enforcing retention payments and resolving outstanding debts from project owners and clients.',
-    cases: ['Unpaid contract invoices', 'Retention fee disputes', 'Subcontractor payment arrears', 'Equipment hire debts'],
-  },
-  {
-    icon: ShieldCheckIcon,
-    title: 'Insurance Companies',
-    description:
-      'We support insurance firms in recovering fraudulent claims, unpaid premiums and outstanding balances, backed by thorough investigation and compliant legal processes.',
-    cases: ['Unpaid premium arrears', 'Fraudulent claim recovery', 'Broker commission disputes', 'Policy debt recovery'],
-  },
-  {
-    icon: DevicePhoneMobileIcon,
-    title: 'Telecom Companies',
-    description:
-      'From post-paid subscribers to corporate account holders, we recover outstanding airtime, data and service fees while preserving customer relationships wherever possible.',
-    cases: ['Post-paid subscriber debts', 'Corporate account arrears', 'Device financing defaults', 'Service fee recovery'],
-  },
-  {
-    icon: HeartIcon,
-    title: 'Healthcare Institutions',
-    description:
-      'Hospitals, clinics and healthcare facilities rely on us to recover outstanding patient bills, insurance reimbursements and corporate health-cover arrears efficiently and professionally.',
-    cases: ['Unpaid patient bills', 'Insurance reimbursements', 'Corporate health-cover debts', 'Medical equipment financing'],
-  },
-  {
-    icon: AcademicCapIcon,
-    title: 'Schools & Universities',
-    description:
-      'Educational institutions trust us to handle the sensitive recovery of outstanding school fees, tuition arrears and student loan defaults with professionalism and discretion.',
-    cases: ['Tuition & school fee arrears', 'Student loan defaults', 'Hostel and boarding arrears', 'Corporate training fee debts'],
-  },
-  {
-    icon: TruckIcon,
-    title: 'Suppliers & Distributors',
-    description:
-      'We help suppliers, wholesalers and distributors recover payment for goods delivered on credit, protecting cash flow and maintaining viable client relationships where appropriate.',
-    cases: ['Trade credit debts', 'Invoice payment defaults', 'Consignment recovery', 'Dealer network arrears'],
-  },
-  {
-    icon: HomeModernIcon,
-    title: 'Real Estate Companies',
-    description:
-      'Property owners, landlords and real estate agents engage us to recover unpaid rent, enforce lease agreements and execute distress for rent proceedings lawfully.',
-    cases: ['Rental arrears recovery', 'Distress for rent', 'Lease agreement enforcement', 'Property management debts'],
-  },
-  {
-    icon: BuildingOffice2Icon,
-    title: 'Government Contractors',
-    description:
-      'We assist private contractors owed payment by government agencies and public institutions, navigating the legal processes required to recover public procurement debts.',
-    cases: ['Government tender payment arrears', 'Public works invoice defaults', 'Procurement contract debts', 'Service contract recovery'],
-  },
-  {
-    icon: ScaleIcon,
-    title: 'Court Brokerage & Process Service',
-    description:
-      'As certified court brokers (Law School of Tanzania, 2023), we execute court decrees, serve legal process documents and enforce judgments across all courts in Tanzania.',
-    cases: ['Execution of court decrees', 'Service of legal process', 'Judgment enforcement', 'Writ of attachment service'],
-  },
-]
+interface ApiIndustry {
+  id: number
+  icon_name: string
+  title: string
+  description: string
+  cases: string[]
+  sort_order: number
+  is_active: boolean
+}
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -108,9 +31,14 @@ function useInView(threshold = 0.1) {
 }
 
 export default function IndustriesPage() {
+  const [industries, setIndustries] = useState<ApiIndustry[]>([])
   const intro   = useInView(0.1)
   const grid    = useInView(0.05)
   const process = useInView(0.1)
+
+  useEffect(() => {
+    apiGet<ApiIndustry[]>('/industries').then(setIndustries).catch(() => {})
+  }, [])
 
   return (
     <>
@@ -212,9 +140,11 @@ export default function IndustriesPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {industries.map((industry, i) => (
+            {industries.map((industry, i) => {
+              const Icon = getIcon(industry.icon_name)
+              return (
               <div
-                key={industry.title}
+                key={industry.id}
                 className={`group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#D4A017]/30 transition-all duration-500 flex flex-col ${
                   grid.inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
@@ -226,7 +156,7 @@ export default function IndustriesPage() {
                 <div className="p-7 flex flex-col flex-1">
                   {/* Icon */}
                   <div className="w-14 h-14 bg-[#0A1F44] group-hover:bg-[#D4A017] rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300 flex-shrink-0">
-                    <industry.icon className="w-7 h-7 text-[#D4A017] group-hover:text-[#0A1F44] transition-colors duration-300" />
+                    <Icon className="w-7 h-7 text-[#D4A017] group-hover:text-[#0A1F44] transition-colors duration-300" />
                   </div>
 
                   {/* Title + description */}
@@ -247,24 +177,17 @@ export default function IndustriesPage() {
                   </div>
 
                   {/* CTA */}
-                  <a
-                    href="/#contact"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      window.location.href = '/'
-                      setTimeout(() => {
-                        const el = document.getElementById('contact')
-                        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
-                      }, 400)
-                    }}
+                  <Link
+                    to="/contact"
                     className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm font-bold text-[#0A1F44] hover:text-[#D4A017] transition-colors group/link"
                   >
                     Submit a Case in This Sector
                     <ArrowRightIcon className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                  </a>
+                  </Link>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -312,20 +235,12 @@ export default function IndustriesPage() {
               Ready to start recovering what's owed to your organisation?
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a
-                href="/#contact"
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.location.href = '/'
-                  setTimeout(() => {
-                    const el = document.getElementById('contact')
-                    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' })
-                  }, 400)
-                }}
+              <Link
+                to="/contact"
                 className="flex items-center gap-2 bg-[#D4A017] text-[#0A1F44] px-7 py-3.5 rounded-md font-bold hover:bg-[#e8b520] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#D4A017]/20"
               >
                 Submit a Debt Case <ArrowRightIcon className="w-4 h-4" />
-              </a>
+              </Link>
               <Link
                 to="/recovery-process"
                 className="flex items-center gap-2 border-2 border-[#D4A017] text-[#D4A017] px-7 py-3.5 rounded-md font-bold hover:bg-[#D4A017] hover:text-[#0A1F44] transition-all hover:-translate-y-0.5"
