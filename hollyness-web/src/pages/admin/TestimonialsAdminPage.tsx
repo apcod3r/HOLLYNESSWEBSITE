@@ -114,7 +114,8 @@ export default function TestimonialsAdminPage() {
       if (photoFile) {
         saved = await apiUpload<Testimonial>(`/testimonials/${saved.id}/photo`, photoFile, token)
       } else if (removePhoto) {
-        saved = await apiDelete<Testimonial>(`/testimonials/${saved.id}/photo`, token) as Testimonial
+        await apiDelete(`/testimonials/${saved.id}/photo`, token)
+        saved = { ...saved, photo_url: null }
       }
       if (modal === 'edit' && editing) {
         setItems(prev => prev.map(t => t.id === saved.id ? saved : t))
