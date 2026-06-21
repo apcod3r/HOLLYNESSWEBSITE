@@ -5,18 +5,17 @@ import { Bars3Icon, XMarkIcon, PhoneIcon } from '@heroicons/react/24/outline'
 // sectionId → smooth-scroll within the homepage
 // href only  → navigate to a standalone page
 const navItems = [
-  { label: 'Home',             sectionId: 'home',      href: null },
-  { label: 'About Us',         sectionId: 'about',     href: null },
-  { label: 'Services',         sectionId: 'services',  href: null },
-  { label: 'Industries',       sectionId: null,        href: '/industries' },
-  { label: 'Recovery Process', sectionId: null,        href: '/recovery-process' },
-  { label: 'Blog',             sectionId: null,        href: '/blog' },
-  { label: 'Testimonials',     sectionId: null,        href: '/testimonials' },
-  { label: 'Contact Us',       sectionId: 'contact',   href: null },
+  { label: 'Home',             sectionId: 'home',  href: null },
+  { label: 'About Us',         sectionId: null,    href: '/about' },
+  { label: 'Services',         sectionId: null,    href: '/services' },
+  { label: 'Industries',       sectionId: null,    href: '/industries' },
+  { label: 'Recovery Process', sectionId: null,    href: '/recovery-process' },
+  { label: 'Blog',             sectionId: null,    href: '/blog' },
+  { label: 'Testimonials',     sectionId: null,    href: '/testimonials' },
+  { label: 'Contact Us',       sectionId: null,    href: '/contact' },
 ]
 
-// Section order as they appear top-to-bottom on the homepage
-const HOME_SECTIONS = ['home', 'about', 'services', 'contact']
+const HOME_SECTIONS = ['home']
 
 const HEADER_H = 90 // px — total header height (top bar + nav)
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { PlusIcon, TrashIcon, XMarkIcon, ShieldCheckIcon, UserIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, XMarkIcon, ShieldCheckIcon, UserIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../contexts/AuthContext'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
@@ -40,6 +40,7 @@ export default function UsersPage() {
   const [errors, setErrors]     = useState<Partial<Record<keyof UserForm, string>>>({})
   const [saving, setSaving]     = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [showPwd, setShowPwd]   = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -197,7 +198,13 @@ export default function UsersPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Password *</label>
-                <input type="password" value={form.password} onChange={set('password')} placeholder="Min. 8 characters" className={inputCls(Boolean(errors.password))} />
+                <div className="relative">
+                  <input type={showPwd ? 'text' : 'password'} value={form.password} onChange={set('password')} placeholder="Min. 8 characters" className={inputCls(Boolean(errors.password)) + ' pr-10'} />
+                  <button type="button" onClick={() => setShowPwd(v => !v)} tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                    {showPwd ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                  </button>
+                </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
               <label className="flex items-center gap-3 cursor-pointer">
