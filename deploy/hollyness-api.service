@@ -1,21 +1,41 @@
 # /etc/systemd/system/hollyness-api.service
-# Copy to /etc/systemd/system/ then: sudo systemctl enable --now hollyness-api
+# Install: sudo cp deploy/hollyness-api.service /etc/systemd/system/
+#          sudo systemctl daemon-reload
+#          sudo systemctl enable --now hollyness-api
 
 [Unit]
 Description=Hollyness & Respishers FastAPI Backend
 After=network.target postgresql.service
+Requires=postgresql.service
 
 [Service]
 Type=simple
 User=ubuntu
+Group=ubuntu
 WorkingDirectory=/var/www/hollyness/hollyness-api
 EnvironmentFile=/var/www/hollyness/hollyness-api/.env
-ExecStart=/var/www/hollyness/hollyness-api/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+
+ExecStart=/var/www/hollyness/hollyness-api/venv/bin/uvicorn \
+    app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 2 \
+    --log-level info
+
+# Restart policy — survives crashes, not manual stops
 Restart=on-failure
 RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+# Logging — view with: journalctl -u hollyness-api -f
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=hollyness-api
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target

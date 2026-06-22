@@ -1,10 +1,19 @@
+import { Link } from 'react-router-dom'
+import ContactSection from '../components/sections/ContactSection'
+
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-[#F4F7FA] flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-[#0A1F44]">Contact Us</h1>
-        <p className="text-gray-500 mt-2">Coming soon — under construction</p>
+    <>
+      <div className="bg-[#0A1F44] pt-28 pb-0">
+        <div className="max-w-7xl mx-auto px-6 pb-4">
+          <div className="flex items-center gap-2 text-[#8A9BB0] text-sm">
+            <Link to="/" className="hover:text-[#D4A017] transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-[#D4A017]">Contact Us</span>
+          </div>
+        </div>
       </div>
-    </div>
+      <ContactSection />
+    </>
   )
 }
