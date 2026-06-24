@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { PlusIcon, TrashIcon, XMarkIcon, ShieldCheckIcon, UserIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, XMarkIcon, ShieldCheckIcon, UserIcon, EyeIcon, EyeSlashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../contexts/AuthContext'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../../lib/api'
 import { useToast } from '../../components/admin/Toast'
@@ -20,6 +20,14 @@ interface UserForm {
   is_admin: boolean
 }
 
+interface EditForm {
+  full_name: string
+  email: string
+  password: string
+  confirm_password: string
+  is_admin: boolean
+}
+
 const EMPTY: UserForm = { email: '', full_name: '', password: '', is_admin: true }
 
 function inputCls(err?: boolean) {
@@ -33,14 +41,21 @@ function fmt(iso: string) {
 export default function UsersPage() {
   const { token, user: currentUser } = useAuth()
   const toast = useToast()
-  const [users, setUsers]       = useState<AdminUserItem[]>([])
-  const [loading, setLoading]   = useState(true)
-  const [showCreate, setCreate] = useState(false)
-  const [form, setForm]         = useState<UserForm>(EMPTY)
-  const [errors, setErrors]     = useState<Partial<Record<keyof UserForm, string>>>({})
-  const [saving, setSaving]     = useState(false)
-  const [deleting, setDeleting] = useState<number | null>(null)
-  const [showPwd, setShowPwd]   = useState(false)
+  const [users, setUsers]           = useState<AdminUserItem[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [showCreate, setCreate]     = useState(false)
+  const [form, setForm]             = useState<UserForm>(EMPTY)
+  const [errors, setErrors]         = useState<Partial<Record<keyof UserForm, string>>>({})
+  const [saving, setSaving]         = useState(false)
+  const [deleting, setDeleting]     = useState<number | null>(null)
+  const [showPwd, setShowPwd]       = useState(false)
+
+  const [editUser, setEditUser]     = useState<AdminUserItem | null>(null)
+  const [editForm, setEditForm]     = useState<EditForm>({ full_name: '', email: '', password: '', confirm_password: '', is_admin: true })
+  const [editErrors, setEditErrors] = useState<Partial<Record<keyof EditForm, string>>>({})
+  const [editSaving, setEditSaving] = useState(false)
+  const [showEditPwd, setShowEditPwd]         = useState(false)
+  const [showEditConfirm, setShowEditConfirm] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -49,12 +64,16 @@ export default function UsersPage() {
 
   useEffect(load, [token])
 
-  const set = (f: keyof UserForm) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const set = (f: keyof UserForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setForm(p => ({ ...p, [f]: val }))
     setErrors(p => ({ ...p, [f]: undefined }))
+  }
+
+  const setEd = (f: keyof EditForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    setEditForm(p => ({ ...p, [f]: val }))
+    setEditErrors(p => ({ ...p, [f]: undefined }))
   }
 
   const validate = () => {
@@ -63,6 +82,18 @@ export default function UsersPage() {
     if (form.full_name.trim().length < 2)   e.full_name = 'Name must be at least 2 characters'
     if (form.password.length < 8)           e.password  = 'Password must be at least 8 characters'
     setErrors(e)
+    return Object.keys(e).length === 0
+  }
+
+  const validateEdit = () => {
+    const e: Partial<Record<keyof EditForm, string>> = {}
+    if (!editForm.email.includes('@'))        e.email     = 'Valid email required'
+    if (editForm.full_name.trim().length < 2) e.full_name = 'Name must be at least 2 characters'
+    if (editForm.password && editForm.password.length < 8)
+      e.password = 'Password must be at least 8 characters'
+    if (editForm.password && editForm.password !== editForm.confirm_password)
+      e.confirm_password = 'Passwords do not match'
+    setEditErrors(e)
     return Object.keys(e).length === 0
   }
 
@@ -79,6 +110,35 @@ export default function UsersPage() {
       toast.error((err as Error).message || 'Creation failed')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const openEdit = (u: AdminUserItem) => {
+    setEditUser(u)
+    setEditForm({ full_name: u.full_name, email: u.email, password: '', confirm_password: '', is_admin: u.is_admin })
+    setEditErrors({})
+    setShowEditPwd(false)
+    setShowEditConfirm(false)
+  }
+
+  const handleEdit = async () => {
+    if (!editUser || !validateEdit()) return
+    setEditSaving(true)
+    try {
+      const payload: Record<string, unknown> = {
+        full_name: editForm.full_name,
+        email: editForm.email,
+        is_admin: editForm.is_admin,
+      }
+      if (editForm.password) payload.password = editForm.password
+      const updated = await apiPatch<AdminUserItem>(`/admin/users/${editUser.id}`, payload, token)
+      setUsers(prev => prev.map(u => u.id === editUser.id ? updated : u))
+      setEditUser(null)
+      toast.success('User updated successfully')
+    } catch (err) {
+      toast.error((err as Error).message || 'Update failed')
+    } finally {
+      setEditSaving(false)
     }
   }
 
@@ -154,20 +214,27 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-right">
-                      {u.id !== currentUser?.id && (
-                        <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => toggleActive(u)}
-                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                              u.is_active ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-green-50 text-green-600 hover:bg-green-100'
-                            }`}>
-                            {u.is_active ? 'Deactivate' : 'Activate'}
-                          </button>
-                          <button onClick={() => setDeleting(u.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            <TrashIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        <button onClick={() => openEdit(u)}
+                          className="p-1.5 text-gray-400 hover:text-[#D4A017] hover:bg-yellow-50 rounded-lg transition-colors"
+                          title="Edit user">
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
+                        {u.id !== currentUser?.id && (
+                          <>
+                            <button onClick={() => toggleActive(u)}
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                                u.is_active ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-green-50 text-green-600 hover:bg-green-100'
+                              }`}>
+                              {u.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button onClick={() => setDeleting(u.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -177,7 +244,7 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Create modal */}
+      {/* ── Create modal ── */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
@@ -222,7 +289,70 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Delete confirm */}
+      {/* ── Edit modal ── */}
+      {editUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Edit User</h3>
+                <p className="text-gray-400 text-xs mt-0.5">Leave password blank to keep it unchanged</p>
+              </div>
+              <button onClick={() => setEditUser(null)} className="text-gray-400 hover:text-gray-600"><XMarkIcon className="w-5 h-5" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name *</label>
+                <input value={editForm.full_name} onChange={setEd('full_name')} placeholder="Full name" className={inputCls(Boolean(editErrors.full_name))} />
+                {editErrors.full_name && <p className="text-red-500 text-xs mt-1">{editErrors.full_name}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address *</label>
+                <input type="email" value={editForm.email} onChange={setEd('email')} placeholder="email@example.com" className={inputCls(Boolean(editErrors.email))} />
+                {editErrors.email && <p className="text-red-500 text-xs mt-1">{editErrors.email}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password <span className="text-gray-400 font-normal">(optional)</span></label>
+                <div className="relative">
+                  <input type={showEditPwd ? 'text' : 'password'} value={editForm.password} onChange={setEd('password')} placeholder="Leave blank to keep current" className={inputCls(Boolean(editErrors.password)) + ' pr-10'} />
+                  <button type="button" onClick={() => setShowEditPwd(v => !v)} tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                    {showEditPwd ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                  </button>
+                </div>
+                {editErrors.password && <p className="text-red-500 text-xs mt-1">{editErrors.password}</p>}
+              </div>
+              {editForm.password && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm New Password *</label>
+                  <div className="relative">
+                    <input type={showEditConfirm ? 'text' : 'password'} value={editForm.confirm_password} onChange={setEd('confirm_password')} placeholder="Repeat new password" className={inputCls(Boolean(editErrors.confirm_password)) + ' pr-10'} />
+                    <button type="button" onClick={() => setShowEditConfirm(v => !v)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                      {showEditConfirm ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {editErrors.confirm_password && <p className="text-red-500 text-xs mt-1">{editErrors.confirm_password}</p>}
+                </div>
+              )}
+              {editUser.id !== currentUser?.id && (
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={editForm.is_admin} onChange={setEd('is_admin')} className="w-4 h-4 rounded border-gray-300 text-[#D4A017] focus:ring-[#D4A017]" />
+                  <span className="text-sm text-gray-700">Admin privileges</span>
+                </label>
+              )}
+            </div>
+            <div className="flex gap-3 p-6 pt-0">
+              <button onClick={() => setEditUser(null)} className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button onClick={handleEdit} disabled={editSaving} className="flex-1 py-2.5 bg-[#D4A017] text-[#0A1F44] rounded-lg text-sm font-bold hover:bg-[#e8b520] disabled:opacity-60">
+                {editSaving ? 'Saving…' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete confirm ── */}
       {deleting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">

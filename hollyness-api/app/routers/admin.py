@@ -181,6 +181,39 @@ def toggle_user_active(
     return user
 
 
+class AdminUserUpdate(BaseModel):
+    full_name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    is_admin: bool | None = None
+
+
+@router.patch("/users/{user_id}", response_model=UserOut)
+def update_admin_user(
+    user_id: int,
+    payload: AdminUserUpdate,
+    db: Session = Depends(get_db), current: User = Depends(require_admin)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if payload.email is not None and payload.email != user.email:
+        if db.query(User).filter(User.email == payload.email).first():
+            raise HTTPException(status_code=400, detail="Email already in use")
+        user.email = payload.email
+    if payload.full_name is not None:
+        user.full_name = payload.full_name
+    if payload.password is not None:
+        if len(payload.password) < 8:
+            raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+        user.hashed_password = bcrypt.hashpw(payload.password.encode(), bcrypt.gensalt()).decode()
+    if payload.is_admin is not None and user_id != current.id:
+        user.is_admin = payload.is_admin
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_admin_user(
     user_id: int,

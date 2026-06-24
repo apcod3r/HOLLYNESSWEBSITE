@@ -1,6 +1,7 @@
 #!/bin/bash
 # ============================================================
 # Hollyness & Respishers — Zero-downtime update script
+# Works on Ubuntu and AlmaLinux/RHEL
 # Usage: bash /var/www/hollyness/deploy/update.sh
 # ============================================================
 set -e
@@ -34,28 +35,19 @@ echo "      Frontend build complete."
 echo ""
 echo "[3/5] Updating Python dependencies..."
 cd "$BACKEND_DIR"
-venv/bin/pip install -r requirements.txt -q --upgrade
+venv/bin/pip install -r requirements.txt -q
 echo "      Dependencies up to date."
 
-# ── 4. Run DB migrations (safe — only adds new tables/columns)
+# ── 4. Apply any new DB columns / tables ─────────────────────
 echo ""
 echo "[4/5] Applying database schema updates..."
 venv/bin/python - <<'PYEOF'
 from app.database import engine, Base
-import app.models.blog
-import app.models.career
-import app.models.contact
-import app.models.faq
-import app.models.industry
-import app.models.job_opening
-import app.models.newsletter
-import app.models.partner
-import app.models.process_step
-import app.models.service
-import app.models.setting
-import app.models.team_member
-import app.models.testimonial
-import app.models.user
+import app.models.blog, app.models.career, app.models.contact
+import app.models.faq, app.models.industry, app.models.job_opening
+import app.models.newsletter, app.models.partner, app.models.process_step
+import app.models.service, app.models.setting, app.models.team_member
+import app.models.testimonial, app.models.user
 Base.metadata.create_all(bind=engine)
 print("      Schema is up to date.")
 PYEOF
@@ -63,11 +55,11 @@ PYEOF
 # ── 5. Restart API ───────────────────────────────────────────
 echo ""
 echo "[5/5] Restarting API service..."
-sudo systemctl restart "$SERVICE"
+systemctl restart "$SERVICE" 2>/dev/null || sudo systemctl restart "$SERVICE"
 sleep 3
 
 if systemctl is-active --quiet "$SERVICE"; then
-    echo "      Service is running. ✓"
+    echo "      Service is running. OK"
 else
     echo "      ERROR: Service failed to start. Check logs:"
     echo "      journalctl -u $SERVICE -n 30 --no-pager"
