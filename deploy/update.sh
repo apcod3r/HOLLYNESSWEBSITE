@@ -49,6 +49,16 @@ import app.models.newsletter, app.models.partner, app.models.process_step
 import app.models.service, app.models.setting, app.models.team_member
 import app.models.testimonial, app.models.user
 Base.metadata.create_all(bind=engine)
+
+# Safe column migrations — adds new columns to existing tables without data loss
+from sqlalchemy import text
+migrations = [
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superuser BOOLEAN DEFAULT FALSE",
+]
+with engine.connect() as conn:
+    for sql in migrations:
+        conn.execute(text(sql))
+    conn.commit()
 print("      Schema is up to date.")
 PYEOF
 

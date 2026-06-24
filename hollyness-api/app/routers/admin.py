@@ -144,7 +144,7 @@ class AdminUserCreate(BaseModel):
 
 @router.get("/users", response_model=List[UserOut])
 def list_users(db: Session = Depends(get_db), _: User = Depends(require_admin)):
-    return db.query(User).order_by(User.created_at.desc()).all()
+    return db.query(User).filter(User.is_superuser == False).order_by(User.created_at.desc()).all()
 
 
 @router.post("/users", response_model=UserOut, status_code=status.HTTP_201_CREATED)
@@ -175,6 +175,8 @@ def toggle_user_active(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.is_superuser:
+        raise HTTPException(status_code=403, detail="Superuser accounts cannot be modified")
     user.is_active = not user.is_active
     db.commit()
     db.refresh(user)
@@ -197,6 +199,8 @@ def update_admin_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.is_superuser:
+        raise HTTPException(status_code=403, detail="Superuser accounts cannot be modified")
     if payload.email is not None and payload.email != user.email:
         if db.query(User).filter(User.email == payload.email).first():
             raise HTTPException(status_code=400, detail="Email already in use")
@@ -224,5 +228,7 @@ def delete_admin_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.is_superuser:
+        raise HTTPException(status_code=403, detail="Superuser accounts cannot be deleted")
     db.delete(user)
     db.commit()
