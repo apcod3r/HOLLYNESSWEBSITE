@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDownIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
@@ -72,6 +73,11 @@ export default function FaqPage() {
 
   return (
     <>
+      <SEO
+        title="FAQ"
+        description="Answers to common questions about debt collection, public auctions, court order enforcement and working with Hollyness & Respishers in Tanzania."
+        path="/faq"
+      />
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-2 text-[#8A9BB0] text-sm mb-4">

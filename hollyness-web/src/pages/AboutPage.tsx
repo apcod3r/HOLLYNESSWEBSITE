@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -55,6 +56,11 @@ export default function AboutPage() {
 
   return (
     <>
+      <SEO
+        title="About Us"
+        description="Hollyness & Respishers Co. Ltd — our history, mission, vision and values. A licensed Tanzanian firm specialising in debt recovery, auctioneering and court order execution since 2021."
+        path="/about"
+      />
       {/* ── Page Header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

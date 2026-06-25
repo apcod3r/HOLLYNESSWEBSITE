@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiGet } from '../lib/api'
@@ -273,6 +274,11 @@ export default function BlogPage() {
 
   return (
     <>
+      <SEO
+        title="Blog & Insights"
+        description="Expert insights on debt recovery, public auctioneering, credit management and legal enforcement in Tanzania from the team at Hollyness & Respishers."
+        path="/blog"
+      />
       {/* ── Page header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

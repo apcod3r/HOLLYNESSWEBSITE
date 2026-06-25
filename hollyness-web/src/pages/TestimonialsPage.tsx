@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -181,6 +182,11 @@ export default function TestimonialsPage() {
 
   return (
     <>
+      <SEO
+        title="Client Testimonials"
+        description="Read what clients say about Hollyness & Respishers — verified testimonials from banks, businesses and individuals across Tanzania who recovered their debts."
+        path="/testimonials"
+      />
       {/* ── Page header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

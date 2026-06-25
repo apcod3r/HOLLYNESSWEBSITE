@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -119,6 +120,11 @@ export default function TeamPage() {
 
   return (
     <>
+      <SEO
+        title="Our Team"
+        description="Meet the licensed professionals behind Hollyness & Respishers — experts in debt recovery, public auctioneering, legal enforcement and client relations across Tanzania."
+        path="/team"
+      />
       {/* ── Page Header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

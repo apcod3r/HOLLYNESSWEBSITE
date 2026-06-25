@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -53,6 +54,11 @@ export default function RecoveryProcessPage() {
 
   return (
     <>
+      <SEO
+        title="Our Recovery Process"
+        description="Our structured 7-step debt recovery process: case submission, assessment, engagement, negotiation, legal action, auction and case closure — transparent at every stage."
+        path="/recovery-process"
+      />
       {/* ── Page header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

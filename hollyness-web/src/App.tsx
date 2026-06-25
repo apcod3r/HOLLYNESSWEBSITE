@@ -1,3 +1,4 @@
+import { HelmetProvider } from 'react-helmet-async'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import AdminLayout from './components/admin/AdminLayout'
@@ -52,6 +53,7 @@ function RequireAdmin() {
 
 export default function App() {
   return (
+    <HelmetProvider>
     <BrowserRouter>
       <Routes>
         {/* ── Public site ──────────────────────────────────────────────── */}
@@ -102,5 +104,6 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </HelmetProvider>
   )
 }

@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
@@ -84,6 +85,13 @@ export default function BlogPostPage() {
 
   return (
     <>
+      <SEO
+        title={post?.title}
+        description={post?.excerpt ?? undefined}
+        path={`/blog/${slug}`}
+        image={post?.cover_image ?? undefined}
+        type="article"
+      />
       {/* ── Header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-6">

@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -42,6 +43,11 @@ export default function IndustriesPage() {
 
   return (
     <>
+      <SEO
+        title="Industries We Serve"
+        description="Hollyness & Respishers serves banks, MFIs, SACCOs, healthcare providers, real estate firms, telecoms and more — sector-specific debt recovery across Tanzania."
+        path="/industries"
+      />
       {/* ── Page header ── */}
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">

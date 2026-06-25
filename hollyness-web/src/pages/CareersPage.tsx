@@ -1,3 +1,4 @@
+import SEO from '../components/SEO'
 import { useEffect, useRef, useState } from 'react'
 import { BriefcaseIcon, MapPinIcon, ClockIcon, ArrowRightIcon, CheckCircleIcon, UserGroupIcon, LightBulbIcon, ShieldCheckIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { apiGet, apiPost } from '../lib/api'
@@ -84,6 +85,11 @@ export default function CareersPage() {
 
   return (
     <>
+      <SEO
+        title="Careers"
+        description="Join Hollyness & Respishers — career opportunities in debt recovery, legal enforcement, auctioneering and operations across Tanzania. Submit your application today."
+        path="/careers"
+      />
       <div className="bg-[#0A1F44] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-2 text-[#8A9BB0] text-sm mb-4">
